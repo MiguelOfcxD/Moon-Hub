@@ -1,25 +1,20 @@
--- Moon Hub🌙 + Fly simples
-
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
--- Criar GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MoonHubGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Botão toggle (imagem lua) no canto superior direito
+-- Botão toggle (imagem lua)
 local toggleButton = Instance.new("ImageButton")
 toggleButton.Name = "ToggleButton"
 toggleButton.Size = UDim2.new(0, 40, 0, 40)
 toggleButton.Position = UDim2.new(1, -50, 0, 20)
 toggleButton.AnchorPoint = Vector2.new(0, 0)
 toggleButton.BackgroundTransparency = 1
-toggleButton.Image = "rbxassetid://6031075938" -- imagem da lua
+toggleButton.Image = "rbxassetid://6031075938"
 toggleButton.Parent = screenGui
 
 -- Frame principal (hub) centralizado
@@ -55,7 +50,7 @@ speedLabel.TextSize = 18
 speedLabel.TextColor3 = Color3.new(1, 1, 1)
 speedLabel.Parent = mainFrame
 
--- Botão aumentar velocidade
+-- Botões aumentar/diminuir velocidade
 local increaseButton = Instance.new("TextButton")
 increaseButton.Size = UDim2.new(0.4, 0, 0, 30)
 increaseButton.Position = UDim2.new(0.55, 0, 0, 90)
@@ -66,7 +61,6 @@ increaseButton.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
 increaseButton.TextColor3 = Color3.new(1, 1, 1)
 increaseButton.Parent = mainFrame
 
--- Botão diminuir velocidade
 local decreaseButton = Instance.new("TextButton")
 decreaseButton.Size = UDim2.new(0.4, 0, 0, 30)
 decreaseButton.Position = UDim2.new(0.05, 0, 0, 90)
@@ -88,12 +82,31 @@ flyButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 flyButton.TextColor3 = Color3.new(1, 1, 1)
 flyButton.Parent = mainFrame
 
--- Variáveis
+-- Variáveis do script
 local speed = 16
 local flying = false
 local flySpeed = 50
 local bodyVelocity
 local bodyGyro
+
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local function updateCharacter()
+	character = player.Character or player.CharacterAdded:Wait()
+	humanoid = character:WaitForChild("Humanoid")
+	-- Resetar walk speed caso necessário
+	humanoid.WalkSpeed = speed
+end
+
+player.CharacterAdded:Connect(function()
+	updateCharacter()
+	-- Caso esteja voando, reaplicar o fly
+	if flying then
+		flying = false
+		toggleFly()
+	end
+end)
 
 local function updateSpeedLabel()
 	speedLabel.Text = "Velocidade: "..speed
