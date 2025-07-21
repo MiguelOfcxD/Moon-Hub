@@ -1,50 +1,71 @@
--- MoonHub Launcher 🌙
+-- Moon Hub Launcher 🌙
 
 local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
+local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "MoonHubLauncher"
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 150)
-frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 112)
-frame.BackgroundTransparency = 0.1
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 400, 0, 220)
+frame.Position = UDim2.new(0.5, -200, 0.5, -110)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 frame.BorderSizePixel = 0
-frame.Parent = gui
+frame.Active = true
+frame.Draggable = true
 
-local title = Instance.new("TextLabel")
+local uicorner = Instance.new("UICorner", frame)
+uicorner.CornerRadius = UDim.new(0, 12)
+
+local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 10)
 title.BackgroundTransparency = 1
-title.Text = "Moon Hub Launcher"
+title.Text = "Moon Hub🌙"
 title.Font = Enum.Font.GothamBold
-title.TextSize = 24
+title.TextSize = 28
 title.TextColor3 = Color3.new(1,1,1)
-title.Parent = frame
 
-local btnAbas = Instance.new("TextButton")
-btnAbas.Size = UDim2.new(0.8, 0, 0, 40)
-btnAbas.Position = UDim2.new(0.1, 0, 0, 50)
-btnAbas.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-btnAbas.TextColor3 = Color3.new(1,1,1)
+local subtitle = Instance.new("TextLabel", frame)
+subtitle.Size = UDim2.new(1, -40, 0, 30)
+subtitle.Position = UDim2.new(0, 20, 0, 60)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Escolha Sua Versão Preferida"
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 18
+subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+
+local btnAbas = Instance.new("TextButton", frame)
+btnAbas.Size = UDim2.new(0, 160, 0, 40)
+btnAbas.Position = UDim2.new(0, 50, 0, 120)
+btnAbas.Text = "Com Abas"
 btnAbas.Font = Enum.Font.GothamBold
 btnAbas.TextSize = 20
-btnAbas.Text = "Moon Hub com Abas"
-btnAbas.Parent = frame
+btnAbas.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+btnAbas.TextColor3 = Color3.new(1,1,1)
+btnAbas.AutoButtonColor = true
+local cornerAbas = Instance.new("UICorner", btnAbas)
+cornerAbas.CornerRadius = UDim.new(0, 8)
 
-local btnSimples = btnAbas:Clone()
-btnSimples.Position = UDim2.new(0.1, 0, 0, 100)
-btnSimples.Text = "Moon Hub Simples"
-btnSimples.Parent = frame
+local btnSimples = Instance.new("TextButton", frame)
+btnSimples.Size = UDim2.new(0, 160, 0, 40)
+btnSimples.Position = UDim2.new(0, 190, 0, 120)
+btnSimples.Text = "Simples"
+btnSimples.Font = Enum.Font.GothamBold
+btnSimples.TextSize = 20
+btnSimples.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+btnSimples.TextColor3 = Color3.new(1,1,1)
+btnSimples.AutoButtonColor = true
+local cornerSimples = Instance.new("UICorner", btnSimples)
+cornerSimples.CornerRadius = UDim.new(0, 8)
 
 btnAbas.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
-	gui:Destroy()
+    -- Remove launcher GUI
+    gui:Destroy()
+    -- Load MoonHub Abas
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
 end)
 
 btnSimples.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
-	gui:Destroy()
+    gui:Destroy()
+    -- Load MoonHub Simples
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
 end)
