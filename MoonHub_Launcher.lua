@@ -1,131 +1,87 @@
--- Moon Hub Launcher 🌙 por Miguel
+-- Moon Hub Launcher 🌙 - Estilo KRNL
 
--- Serviços
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "MoonHubLauncherGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
 
--- Criar tela
-local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-ScreenGui.Name = "MoonHubLauncher"
-ScreenGui.ResetOnSpawn = false
-
--- Janela principal
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 450, 0, 280)
-MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Visible = true
-
--- UICorner e sombra
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 12)
-local UIStroke = Instance.new("UIStroke", MainFrame)
-UIStroke.Thickness = 1
-UIStroke.Color = Color3.fromRGB(85, 85, 85)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 450, 0, 300)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 112)
+frame.BackgroundTransparency = 0.2
+frame.BorderSizePixel = 0
+frame.Parent = gui
 
 -- Título
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.BackgroundTransparency = 1
-Title.Text = "Moon Hub🌙"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Moon Hub🌙"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 30
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Parent = frame
 
 -- Subtítulo
-local Subtitle = Instance.new("TextLabel", MainFrame)
-Subtitle.Size = UDim2.new(1, 0, 0, 30)
-Subtitle.Position = UDim2.new(0, 0, 0, 50)
-Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "Escolha sua versão preferida"
-Subtitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-Subtitle.TextScaled = true
-Subtitle.Font = Enum.Font.Gotham
+local subtitle = Instance.new("TextLabel")
+subtitle.Size = UDim2.new(1, 0, 0, 25)
+subtitle.Position = UDim2.new(0, 0, 0, 40)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "Escolha Sua Versão Preferida"
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 20
+subtitle.TextColor3 = Color3.new(1, 1, 1)
+subtitle.Parent = frame
 
--- Função botão
-local function criarBotao(nome, posY, link)
-	local Btn = Instance.new("TextButton", MainFrame)
-	Btn.Size = UDim2.new(0.8, 0, 0, 40)
-	Btn.Position = UDim2.new(0.1, 0, 0, posY)
-	Btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-	Btn.Text = nome
-	Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Btn.TextScaled = true
-	Btn.Font = Enum.Font.GothamBold
+-- Botão Versão com Abas
+local btnAbas = Instance.new("TextButton")
+btnAbas.Size = UDim2.new(0.8, 0, 0, 50)
+btnAbas.Position = UDim2.new(0.1, 0, 0, 90)
+btnAbas.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+btnAbas.TextColor3 = Color3.new(1, 1, 1)
+btnAbas.Font = Enum.Font.GothamBold
+btnAbas.TextSize = 24
+btnAbas.Text = "Versão Com Abas"
+btnAbas.Parent = frame
 
-	local UICornerBtn = Instance.new("UICorner", Btn)
-	UICornerBtn.CornerRadius = UDim.new(0, 8)
-
-	Btn.MouseEnter:Connect(function()
-		TweenService:Create(Btn, TweenInfo.new(0.2), {
-			BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-		}):Play()
-	end)
-
-	Btn.MouseLeave:Connect(function()
-		TweenService:Create(Btn, TweenInfo.new(0.2), {
-			BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-		}):Play()
-	end)
-
-	Btn.MouseButton1Click:Connect(function()
-		pcall(function()
-			loadstring(game:HttpGet(link))()
-			MainFrame.Visible = false
-			OpenButton.Visible = true
-		end)
-	end)
-end
-
--- Botões
-criarBotao("🌑 Versão Simples", 100, "https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua")
-criarBotao("🌓 Versão com Abas", 150, "https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua")
+-- Botão Versão Simples
+local btnSimples = Instance.new("TextButton")
+btnSimples.Size = UDim2.new(0.8, 0, 0, 50)
+btnSimples.Position = UDim2.new(0.1, 0, 0, 160)
+btnSimples.BackgroundColor3 = Color3.fromRGB(100, 149, 237)
+btnSimples.TextColor3 = Color3.new(1, 1, 1)
+btnSimples.Font = Enum.Font.GothamBold
+btnSimples.TextSize = 24
+btnSimples.Text = "Versão Simples"
+btnSimples.Parent = frame
 
 -- Créditos
-local Credits = Instance.new("TextLabel", MainFrame)
-Credits.Size = UDim2.new(1, 0, 0, 25)
-Credits.Position = UDim2.new(0, 0, 1, -25)
-Credits.BackgroundTransparency = 1
-Credits.Text = "Feito por Miguel"
-Credits.TextColor3 = Color3.fromRGB(120, 120, 120)
-Credits.TextScaled = true
-Credits.Font = Enum.Font.Gotham
+local credits = Instance.new("TextLabel")
+credits.Size = UDim2.new(1, 0, 0, 20)
+credits.Position = UDim2.new(0, 0, 1, -25)
+credits.BackgroundTransparency = 1
+credits.Text = "© Miguel"
+credits.Font = Enum.Font.GothamItalic
+credits.TextSize = 16
+credits.TextColor3 = Color3.new(1, 1, 1)
+credits.TextTransparency = 0.5
+credits.Parent = frame
 
--- Botão Fechar
-local CloseButton = Instance.new("TextButton", MainFrame)
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -35, 0, 5)
-CloseButton.Text = "X"
-CloseButton.TextColor3 = Color3.fromRGB(255, 100, 100)
-CloseButton.TextScaled = true
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.BackgroundTransparency = 1
+-- Função para fechar launcher ao abrir um script
+local function closeLauncher()
+    gui.Enabled = false
+end
 
-CloseButton.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-	OpenButton.Visible = true
+-- Eventos dos botões
+btnAbas.MouseButton1Click:Connect(function()
+    closeLauncher()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
 end)
 
--- Botão Abrir
-OpenButton = Instance.new("TextButton", ScreenGui)
-OpenButton.Size = UDim2.new(0, 120, 0, 35)
-OpenButton.Position = UDim2.new(0, 10, 0, 10)
-OpenButton.Text = "Abrir Moon Hub🌙"
-OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-OpenButton.TextScaled = true
-OpenButton.Font = Enum.Font.Gotham
-OpenButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-OpenButton.Visible = false
-
-local UICornerOpen = Instance.new("UICorner", OpenButton)
-UICornerOpen.CornerRadius = UDim.new(0, 8)
-
-OpenButton.MouseButton1Click:Connect(function()
-	MainFrame.Visible = true
-	OpenButton.Visible = false
+btnSimples.MouseButton1Click:Connect(function()
+    closeLauncher()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
 end)
