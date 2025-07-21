@@ -1,271 +1,380 @@
--- Moon Hub 🌙 com Abas
+-- MoonHub com abas - Versão atualizada
 
-local player = game.Players.LocalPlayer
-local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "MoonHubAbas"
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- Estado das funções
+local flyEnabled = false
+local noclipEnabled = false
+
+-- Configs iniciais
+local walkSpeed = 16
+local jumpPower = 50
+
+-- Criar GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "MoonHubGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Botão abrir/fechar
+local toggleBtn = Instance.new("ImageButton")
+toggleBtn.Size = UDim2.new(0, 40, 0, 40)
+toggleBtn.Position = UDim2.new(1, -50, 0, 20)
+toggleBtn.AnchorPoint = Vector2.new(0, 0)
+toggleBtn.BackgroundTransparency = 1
+toggleBtn.Image = "rbxassetid://6031075938" -- lua
+toggleBtn.Parent = gui
 
 -- Janela principal
-local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 450, 0, 350)
-Main.Position = UDim2.new(0.5, -225, 0.5, -175)
-Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Main.BorderSizePixel = 0
-Main.Active = true
-Main.Draggable = true
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 320)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 112)
+frame.BackgroundTransparency = 0.2
+frame.BorderSizePixel = 0
+frame.Visible = false
+frame.Parent = gui
+frame.Active = true
+frame.Draggable = true
 
-local UICorner = Instance.new("UICorner", Main)
-UICorner.CornerRadius = UDim.new(0, 12)
+local uicorner = Instance.new("UICorner", frame)
+uicorner.CornerRadius = UDim.new(0, 10)
 
-local Title = Instance.new("TextLabel", Main)
-Title.Text = "Moon Hub🌙"
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 22
+-- Botão fechar
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(178, 34, 34)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+closeBtn.Text = "X"
+closeBtn.Parent = frame
 
-local CloseButton = Instance.new("TextButton", Main)
-CloseButton.Text = "X"
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -40, 0, 5)
-CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.TextSize = 18
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
+-- Título
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Moon Hub 🌙"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Parent = frame
 
--- Container de abas e painéis
-local TabButtonsFrame = Instance.new("Frame", Main)
-TabButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
-TabButtonsFrame.Position = UDim2.new(0, 0, 0, 35)
-TabButtonsFrame.BackgroundTransparency = 1
+-- Abas container
+local tabsContainer = Instance.new("Frame")
+tabsContainer.Size = UDim2.new(1, 0, 0, 35)
+tabsContainer.Position = UDim2.new(0, 0, 0, 35)
+tabsContainer.BackgroundTransparency = 1
+tabsContainer.Parent = frame
 
-local PanelsFrame = Instance.new("Frame", Main)
-PanelsFrame.Size = UDim2.new(1, -20, 1, -80)
-PanelsFrame.Position = UDim2.new(0, 10, 0, 75)
-PanelsFrame.BackgroundTransparency = 1
+local panels = {}
 
-local function CreateTabButton(name, position)
-    local btn = Instance.new("TextButton", TabButtonsFrame)
-    btn.Size = UDim2.new(0, 130, 1, 0)
-    btn.Position = UDim2.new(0, position, 0, 0)
-    btn.Text = name
+local function createTab(name, posX)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 120, 1, 0)
+    btn.Position = UDim2.new(0, posX, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 18
-    btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 8)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Text = name
+    btn.Parent = tabsContainer
     return btn
 end
 
-local function CreatePanel()
-    local panel = Instance.new("Frame", PanelsFrame)
-    panel.Size = UDim2.new(1, 0, 1, 0)
-    panel.BackgroundTransparency = 1
-    panel.Visible = false
-    return panel
+local function createPanel()
+    local pnl = Instance.new("Frame")
+    pnl.Size = UDim2.new(1, -20, 1, -75)
+    pnl.Position = UDim2.new(0, 10, 0, 75)
+    pnl.BackgroundTransparency = 1
+    pnl.Visible = false
+    pnl.Parent = frame
+    return pnl
 end
 
--- Função auxiliar para criar botão dentro do painel
-local function CreatePanelButton(parent, text, callback)
-    local btn = Instance.new("TextButton", parent)
-    btn.Size = UDim2.new(0, 200, 0, 40)
-    btn.Position = UDim2.new(0, 0, 0, (#parent:GetChildren() * 45) - 45) -- vertical empilhamento
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 16
-    btn.Text = text
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 8)
-    btn.MouseButton1Click:Connect(callback)
-    return btn
+-- Criar abas e painéis
+local tabMovement = createTab("Movimentação", 10)
+local tabFunctions = createTab("Funções", 130)
+local tabExtras = createTab("Extras", 250)
+
+local panelMovement = createPanel()
+local panelFunctions = createPanel()
+local panelExtras = createPanel()
+
+panels["Movimentação"] = panelMovement
+panels["Funções"] = panelFunctions
+panels["Extras"] = panelExtras
+
+-- Ativar aba
+local function setActiveTab(name)
+    for tabName, pnl in pairs(panels) do
+        pnl.Visible = (tabName == name)
+    end
+    for _, tab in ipairs(tabsContainer:GetChildren()) do
+        if tab:IsA("TextButton") then
+            tab.BackgroundColor3 = (tab.Text == name) and Color3.fromRGB(100, 149, 237) or Color3.fromRGB(70, 130, 180)
+        end
+    end
 end
 
--- Variáveis
-local speed = 16
-local jump = 50
-local flyAtivo = false
-local noclipAtivo = false
-local killAuraAtivo = false
-local killAuraConnection
-
--- Abas
-local tabMovement = CreateTabButton("Movimentação", 0)
-local tabFunctions = CreateTabButton("Funções", 140)
-local tabExtras = CreateTabButton("Extras", 280)
-
-local panelMovement = CreatePanel()
-local panelFunctions = CreatePanel()
-local panelExtras = CreatePanel()
-
-panelMovement.Visible = true
-
-local function showPanel(panel)
-    panelMovement.Visible = false
-    panelFunctions.Visible = false
-    panelExtras.Visible = false
-    panel.Visible = true
-end
+setActiveTab("Movimentação")
 
 tabMovement.MouseButton1Click:Connect(function()
-    showPanel(panelMovement)
+    setActiveTab("Movimentação")
 end)
-
 tabFunctions.MouseButton1Click:Connect(function()
-    showPanel(panelFunctions)
+    setActiveTab("Funções")
 end)
-
 tabExtras.MouseButton1Click:Connect(function()
-    showPanel(panelExtras)
+    setActiveTab("Extras")
 end)
 
--- Movimento - Velocidade
-local btnSpeedUp = CreatePanelButton(panelMovement, "Aumentar Velocidade", function()
-    speed = speed + 10
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = speed
+-- Função helper para criar sliders com + e - e label
+local function createSlider(parent, labelText, yPos, initialValue, minValue, maxValue, callback)
+    local value = initialValue
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.6, 0, 0, 25)
+    label.Position = UDim2.new(0, 0, 0, yPos)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1,1,1)
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 18
+    label.Text = labelText .. ": " .. value
+    label.Parent = parent
+
+    local plus = Instance.new("TextButton")
+    plus.Size = UDim2.new(0, 30, 0, 25)
+    plus.Position = UDim2.new(0.65, 0, 0, yPos)
+    plus.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
+    plus.TextColor3 = Color3.new(1,1,1)
+    plus.Font = Enum.Font.GothamBold
+    plus.TextSize = 20
+    plus.Text = "+"
+    plus.Parent = parent
+
+    local minus = Instance.new("TextButton")
+    minus.Size = UDim2.new(0, 30, 0, 25)
+    minus.Position = UDim2.new(0.75, 0, 0, yPos)
+    minus.BackgroundColor3 = Color3.fromRGB(178, 34, 34)
+    minus.TextColor3 = Color3.new(1,1,1)
+    minus.Font = Enum.Font.GothamBold
+    minus.TextSize = 20
+    minus.Text = "-"
+    minus.Parent = parent
+
+    local function updateValue(newVal)
+        value = math.clamp(newVal, minValue, maxValue)
+        label.Text = labelText .. ": " .. value
+        if callback then
+            callback(value)
+        end
     end
+
+    plus.MouseButton1Click:Connect(function()
+        updateValue(value + 1)
+    end)
+    minus.MouseButton1Click:Connect(function()
+        updateValue(value - 1)
+    end)
+
+    return label, plus, minus, function() return value end
+end
+
+-- Movimentação: Velocidade e Pulo
+local speedLabel, speedPlus, speedMinus, getSpeed = createSlider(panelMovement, "Velocidade", 10, walkSpeed, 0, 250, function(v)
+    walkSpeed = v
+    humanoid.WalkSpeed = walkSpeed
 end)
 
-local btnSpeedDown = CreatePanelButton(panelMovement, "Diminuir Velocidade", function()
-    speed = math.max(0, speed - 10)
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = speed
+local jumpLabel, jumpPlus, jumpMinus, getJump = createSlider(panelMovement, "Pulo", 50, jumpPower, 0, 250, function(v)
+    jumpPower = v
+    humanoid.JumpPower = jumpPower
+end)
+
+-- Funções: Fly e Noclip toggle buttons
+local function createToggleButton(parent, textOff, yPos, initialState, callback)
+    local state = initialState
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 35)
+    btn.Position = UDim2.new(0.1, 0, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 20
+    btn.Text = textOff .. ": OFF"
+    btn.Parent = parent
+
+    local function update()
+        btn.Text = textOff .. ": " .. (state and "ON" or "OFF")
+        if callback then
+            callback(state)
+        end
     end
-end)
 
--- Movimento - Pulo
-local btnJumpUp = CreatePanelButton(panelMovement, "Aumentar Pulo", function()
-    jump = jump + 10
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.JumpPower = jump
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        update()
+    end)
+
+    update()
+    return btn, function() return state end, function(s)
+        state = s
+        update()
     end
-end)
+end
 
-local btnJumpDown = CreatePanelButton(panelMovement, "Diminuir Pulo", function()
-    jump = math.max(0, jump - 10)
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.JumpPower = jump
+-- Fly Implementation
+local bodyGyro, bodyVelocity
+
+local function toggleFly(on)
+    if on then
+        humanoid.PlatformStand = true
+        bodyGyro = Instance.new("BodyGyro", hrp)
+        bodyGyro.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+        bodyGyro.P = 9e4
+        bodyVelocity = Instance.new("BodyVelocity", hrp)
+        bodyVelocity.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+        bodyVelocity.Velocity = Vector3.new(0,0,0)
+    else
+        humanoid.PlatformStand = false
+        if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
+        if bodyVelocity then bodyVelocity:Destroy() bodyVelocity = nil end
     end
+end
+
+local flyBtn, isFlyOn, setFlyOn = createToggleButton(panelFunctions, "Fly", 10, flyEnabled, function(state)
+    flyEnabled = state
+    toggleFly(flyEnabled)
 end)
 
--- Funções - Fly
-local btnFlyOn = CreatePanelButton(panelFunctions, "Ativar Fly", function()
-    if flyAtivo then return end
-    flyAtivo = true
+-- Fly control movement
+RunService.Heartbeat:Connect(function()
+    if flyEnabled and bodyGyro and bodyVelocity then
+        local cam = workspace.CurrentCamera
+        local moveVector = Vector3.new(0,0,0)
 
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-    local bodyGyro = Instance.new("BodyGyro", humanoidRootPart)
-    local bodyVelocity = Instance.new("BodyVelocity", humanoidRootPart)
-
-    bodyGyro.P = 9e4
-    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-    bodyGyro.CFrame = humanoidRootPart.CFrame
-
-    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-    bodyVelocity.Velocity = Vector3.new(0,0,0)
-
-    local flyConnection
-    flyConnection = RunService.Heartbeat:Connect(function()
-        if not flyAtivo then
-            flyConnection:Disconnect()
-            bodyGyro:Destroy()
-            bodyVelocity:Destroy()
-            return
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            moveVector += cam.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            moveVector -= cam.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            moveVector -= cam.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            moveVector += cam.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            moveVector += Vector3.new(0,1,0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+            moveVector -= Vector3.new(0,1,0)
         end
 
-        local cam = workspace.CurrentCamera
-        local moveDir = Vector3.zero
-
-        if UIS:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - cam.CFrame.LookVector end
-        if UIS:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + cam.CFrame.RightVector end
-        if UIS:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + cam.CFrame.UpVector end
-        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then moveDir = moveDir - cam.CFrame.UpVector end
-
-        bodyVelocity.Velocity = moveDir.Unit * speed
-        bodyGyro.CFrame = cam.CFrame
-    end)
+        if moveVector.Magnitude > 0 then
+            moveVector = moveVector.Unit * 50
+            bodyVelocity.Velocity = moveVector
+            bodyGyro.CFrame = cam.CFrame
+        else
+            bodyVelocity.Velocity = Vector3.new(0,0,0)
+        end
+    end
 end)
 
-local btnFlyOff = CreatePanelButton(panelFunctions, "Desativar Fly", function()
-    flyAtivo = false
-end)
-
--- Funções - Noclip
-local btnNoclipOn = CreatePanelButton(panelFunctions, "Ativar Noclip", function()
-    noclipAtivo = true
-end)
-
-local btnNoclipOff = CreatePanelButton(panelFunctions, "Desativar Noclip", function()
-    noclipAtivo = false
+-- Noclip toggle implementation
+local noclipBtn, isNoclipOn, setNoclipOn = createToggleButton(panelFunctions, "Noclip", 60, noclipEnabled, function(state)
+    noclipEnabled = state
 end)
 
 RunService.Stepped:Connect(function()
-    if noclipAtivo and player.Character then
-        for _, part in ipairs(player.Character:GetDescendants()) do
+    if noclipEnabled then
+        for _, part in ipairs(character:GetDescendants()) do
             if part:IsA("BasePart") then
                 part.CanCollide = false
             end
         end
+    else
+        for _, part in ipairs(character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
     end
 end)
 
--- Extras - FPS Unlocker
-local btnFPSUnlocker = CreatePanelButton(panelExtras, "Desbloquear FPS", function()
-    if setfpscap then
-        setfpscap(999)
+-- Extras: FPS Unlocker toggle and Kill Aura toggle
+
+local fpsUnlockerEnabled = false
+local killAuraEnabled = false
+local killAuraRadius = 15
+
+local fpsBtn, isFpsOn, setFpsOn = createToggleButton(panelExtras, "FPS Unlocker", 10, fpsUnlockerEnabled, function(state)
+    fpsUnlockerEnabled = state
+    if fpsUnlockerEnabled then
+        setfpscap(1000)
+    else
+        setfpscap(60)
     end
 end)
 
--- Extras - Kill Aura com Fling real
-local btnKillAuraOn = CreatePanelButton(panelExtras, "Ativar Kill Aura", function()
-    if killAuraAtivo then return end
-    killAuraAtivo = true
+local killAuraBtn, isKillAuraOn, setKillAuraOn = createToggleButton(panelExtras, "Kill Aura", 60, killAuraEnabled, function(state)
+    killAuraEnabled = state
+end)
 
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-    killAuraConnection = RunService.Heartbeat:Connect(function()
-        for _, target in pairs(game.Players:GetPlayers()) do
-            if target ~= player and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHRP = target.Character.HumanoidRootPart
-                local distance = (humanoidRootPart.Position - targetHRP.Position).Magnitude
-                if distance < 7 then
-                    targetHRP.Velocity = Vector3.zero
-                    targetHRP.AssemblyLinearVelocity = Vector3.zero
-                    targetHRP:ApplyImpulse(Vector3.new(9999, 9999, 9999))
+-- Kill Aura fling implementation
+RunService.Heartbeat:Connect(function()
+    if killAuraEnabled then
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHRP = plr.Character.HumanoidRootPart
+                local dist = (hrp.Position - targetHRP.Position).Magnitude
+                if dist <= killAuraRadius then
+                    -- Fling: aplicar força para afastar
+                    local bodyVelocityFling = Instance.new("BodyVelocity")
+                    bodyVelocityFling.Velocity = (targetHRP.Position - hrp.Position).Unit * 100
+                    bodyVelocityFling.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+                    bodyVelocityFling.Parent = targetHRP
+                    game.Debris:AddItem(bodyVelocityFling, 0.3)
                 end
             end
         end
-    end)
-end)
-
-local btnKillAuraOff = CreatePanelButton(panelExtras, "Desativar Kill Aura", function()
-    if killAuraConnection then
-        killAuraConnection:Disconnect()
-        killAuraConnection = nil
     end
-    killAuraAtivo = false
 end)
 
--- Resetar variáveis ao morrer
+-- Botões abrir/fechar janela
+toggleBtn.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+end)
+
+-- Atualizar humanoid com valores iniciais
+humanoid.WalkSpeed = walkSpeed
+humanoid.JumpPower = jumpPower
+
+-- Reset de personagem: desativa fly e noclip
 player.CharacterAdded:Connect(function(char)
-    flyAtivo = false
-    noclipAtivo = false
-    if killAuraConnection then
-        killAuraConnection:Disconnect()
-        killAuraConnection = nil
-    end
-    killAuraAtivo = false
+    character = char
+    humanoid = char:WaitForChild("Humanoid")
+    hrp = char:WaitForChild("HumanoidRootPart")
+    flyEnabled = false
+    noclipEnabled = false
+    setFlyOn(false)
+    setNoclipOn(false)
+    humanoid.WalkSpeed = walkSpeed
+    humanoid.JumpPower = jumpPower
 end)
