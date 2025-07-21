@@ -1,411 +1,362 @@
--- Moon Hub Com Abas 🌙 - Estilo KRNL moderno, abas, gravidade nula, teleporte
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
--- Variables
-local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local hrp = character:WaitForChild("HumanoidRootPart")
-local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+local gui = Instance.new("ScreenGui")
 gui.Name = "MoonHubAbasGui"
+gui.Parent = playerGui
 gui.ResetOnSpawn = false
 
-local speed = 16
-local jump = 50
-local zeroGravEnabled = false
-local noclipEnabled = false
-local fpsUnlockerEnabled = false
-local killAuraEnabled = false
-local tpToolEnabled = false
-
-local gravityOriginal = workspace.Gravity
-
--- Functions
-
-local function toggleZeroGravity(on)
-    if on then
-        workspace.Gravity = 0
-    else
-        workspace.Gravity = gravityOriginal
-    end
-end
-
-local function toggleNoclip(on)
-    if on then
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
-    else
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
-        end
-    end
-end
-
-local function toggleFPSUnlocker(on)
-    if on then
-        settings().Rendering.QualityLevel = 1
-        settings().Rendering.FrameRateManager.Enable = false
-    else
-        settings().Rendering.QualityLevel = 10
-        settings().Rendering.FrameRateManager.Enable = true
-    end
-end
-
-local function fling(victim)
-    if victim and victim.Character and victim.Character:FindFirstChild("HumanoidRootPart") then
-        local hrpVictim = victim.Character.HumanoidRootPart
-        local force = Instance.new("BodyVelocity")
-        force.MaxForce = Vector3.new(1e6, 1e6, 1e6)
-        force.Velocity = Vector3.new(0, 100, 0)
-        force.Parent = hrpVictim
-        delay(0.3, function() force:Destroy() end)
-    end
-end
-
-local function runKillAura()
-    while killAuraEnabled do
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local dist = (hrp.Position - player.Character.HumanoidRootPart.Position).Magnitude
-                if dist < 10 then
-                    fling(player)
-                end
-            end
-        end
-        wait(0.5)
-    end
-end
-
--- Teleport Tool
-local mouse = LocalPlayer:GetMouse()
-local teleportTool
-
-local function createTpTool()
-    teleportTool = Instance.new("Tool")
-    teleportTool.Name = "TP Tool"
-    teleportTool.RequiresHandle = false
-    teleportTool.CanBeDropped = false
-
-    teleportTool.Activated:Connect(function()
-        local targetPos = mouse.Hit.p
-        if targetPos then
-            if character and hrp then
-                hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
-            end
-        end
-    end)
-end
-
-local function equipTpTool()
-    if not teleportTool then createTpTool() end
-    teleportTool.Parent = LocalPlayer.Backpack
-    LocalPlayer.Character.Humanoid:EquipTool(teleportTool)
-end
-
-local function removeTpTool()
-    if teleportTool and teleportTool.Parent then
-        teleportTool.Parent = nil
-    end
-end
-
--- GUI Creation helpers
-local function createButton(text, posY, parent)
-    local btn = Instance.new("TextButton", parent)
-    btn.Size = UDim2.new(0.8, 0, 0, 35)
-    btn.Position = UDim2.new(0.1, 0, 0, posY)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 18
-    btn.Text = text
-    btn.AutoButtonColor = false
-
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 6)
-
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    end)
-
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    end)
-
-    return btn
-end
-
-local function createToggleButton(text, posY, parent, initialState, callback)
-    local btn = createButton(text .. ": OFF", posY, parent)
-    local state = initialState
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = text .. (state and ": ON" or ": OFF")
-        callback(state)
-    end)
-    return btn
-end
-
-local function createSlider(labelText, posY, defaultValue, minVal, maxVal, parent, callback)
-    local label = Instance.new("TextLabel", parent)
-    label.Size = UDim2.new(0.5, 0, 0, 25)
-    label.Position = UDim2.new(0.1, 0, 0, posY)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.Font = Enum.Font.Gotham
-    label.TextSize = 16
-    label.Text = labelText .. ": " .. defaultValue
-
-    local plusBtn = Instance.new("TextButton", parent)
-    plusBtn.Size = UDim2.new(0, 25, 0, 25)
-    plusBtn.Position = UDim2.new(0.62, 0, 0, posY)
-    plusBtn.Text = "+"
-    plusBtn.Font = Enum.Font.GothamBold
-    plusBtn.TextSize = 20
-    plusBtn.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
-    plusBtn.TextColor3 = Color3.new(1,1,1)
-
-    local minusBtn = Instance.new("TextButton", parent)
-    minusBtn.Size = UDim2.new(0, 25, 0, 25)
-    minusBtn.Position = UDim2.new(0.52, 0, 0, posY)
-    minusBtn.Text = "-"
-    minusBtn.Font = Enum.Font.GothamBold
-    minusBtn.TextSize = 20
-    minusBtn.BackgroundColor3 = Color3.fromRGB(178, 34, 34)
-    minusBtn.TextColor3 = Color3.new(1,1,1)
-
-    plusBtn.MouseButton1Click:Connect(function()
-        if defaultValue < maxVal then
-            defaultValue += 1
-            label.Text = labelText .. ": " .. defaultValue
-            callback(defaultValue)
-        end
-    end)
-    minusBtn.MouseButton1Click:Connect(function()
-        if defaultValue > minVal then
-            defaultValue -= 1
-            label.Text = labelText .. ": " .. defaultValue
-            callback(defaultValue)
-        end
-    end)
-
-    return label, plusBtn, minusBtn
-end
-
--- Main Frame
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 450, 0, 380)
+-- Janela principal
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 450, 0, 320)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-frame.BorderSizePixel = 0
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 112)
 frame.Active = true
 frame.Draggable = true
+frame.Parent = gui
 
 local corner = Instance.new("UICorner", frame)
 corner.CornerRadius = UDim.new(0, 12)
 
--- Title
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 45)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Moon Hub Com Abas 🌙"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 32
-title.TextColor3 = Color3.new(1, 1, 1)
-
--- Close button
-local closeBtn = Instance.new("TextButton", frame)
-closeBtn.Size = UDim2.new(0, 32, 0, 32)
-closeBtn.Position = UDim2.new(1, -40, 0, 6)
+-- Botão fechar
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 28, 0, 28)
+closeBtn.Position = UDim2.new(1, -35, 0, 7)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
 closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 22
-closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-closeBtn.BackgroundTransparency = 1
+closeBtn.Parent = frame
+
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
+
+-- Botão abrir
+local openBtn = Instance.new("TextButton")
+openBtn.Size = UDim2.new(0, 140, 0, 30)
+openBtn.Position = UDim2.new(0, 10, 0, 10)
+openBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+openBtn.TextColor3 = Color3.new(1, 1, 1)
+openBtn.Text = "Abrir Moon Hub 🌙"
+openBtn.Font = Enum.Font.GothamBold
+openBtn.TextSize = 18
+openBtn.Visible = false
+openBtn.Parent = gui
+
+Instance.new("UICorner", openBtn).CornerRadius = UDim.new(0, 6)
 
 closeBtn.MouseButton1Click:Connect(function()
-    frame.Visible = false
-    openBtn.Visible = true
+	frame.Visible = false
+	openBtn.Visible = true
 end)
-
--- Open button
-local openBtn = Instance.new("TextButton", gui)
-openBtn.Size = UDim2.new(0, 140, 0, 40)
-openBtn.Position = UDim2.new(0, 15, 0, 15)
-openBtn.Text = "Abrir Moon Hub Abas"
-openBtn.Font = Enum.Font.GothamBold
-openBtn.TextSize = 20
-openBtn.TextColor3 = Color3.new(1, 1, 1)
-openBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-openBtn.Visible = false
-
-local openCorner = Instance.new("UICorner", openBtn)
-openCorner.CornerRadius = UDim.new(0, 12)
 
 openBtn.MouseButton1Click:Connect(function()
-    frame.Visible = true
-    openBtn.Visible = false
+	frame.Visible = true
+	openBtn.Visible = false
 end)
 
--- Tabs setup
-local tabButtonsFolder = Instance.new("Folder", frame)
-local panelsFolder = Instance.new("Folder", frame)
+-- Criar abas
+local tabs = {}
+local panels = {}
 
-local tabs = {
-    {Name = "Movimentação"},
-    {Name = "Funções"},
-    {Name = "Extras"}
-}
-
-local activePanel = nil
-
-local function createTabButton(name, posX)
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(0, 130, 0, 40)
-    btn.Position = UDim2.new(0, posX, 0, 55)
-    btn.Text = name
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 20
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    btn.TextColor3 = Color3.new(1,1,1)
-
-    local corner = Instance.new("UICorner", btn)
-    corner.CornerRadius = UDim.new(0, 8)
-
-    btn.MouseEnter:Connect(function()
-        if activePanel ~= name then
-            btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        end
-    end)
-    btn.MouseLeave:Connect(function()
-        if activePanel ~= name then
-            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        end
-    end)
-
-    btn.MouseButton1Click:Connect(function()
-        for _, b in pairs(tabButtonsFolder:GetChildren()) do
-            if b:IsA("TextButton") then
-                b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            end
-        end
-        btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-        activePanel = name
-
-        for _, p in pairs(panelsFolder:GetChildren()) do
-            if p:IsA("Frame") then
-                p.Visible = false
-            end
-        end
-        local panel = panelsFolder:FindFirstChild(name .. "Panel")
-        if panel then
-            panel.Visible = true
-        end
-    end)
-
-    btn.Parent = tabButtonsFolder
-    return btn
+local function createTab(name, xPos)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 110, 0, 35)
+	btn.Position = UDim2.new(0, xPos, 0, 45)
+	btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Text = name
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 18
+	btn.Parent = frame
+	return btn
 end
 
--- Create Tabs and Panels
-for i, tabInfo in ipairs(tabs) do
-    local btn = createTabButton(tabInfo.Name, (i -1) * 140 + 10)
-    if i == 1 then
-        btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-        activePanel = tabInfo.Name
-    end
-
-    local panel = Instance.new("Frame", panelsFolder)
-    panel.Name = tabInfo.Name .. "Panel"
-    panel.Size = UDim2.new(1, -20, 1, -110)
-    panel.Position = UDim2.new(0, 10, 0, 105)
-    panel.BackgroundTransparency = 1
-    panel.Visible = i == 1
+local function createPanel()
+	local pnl = Instance.new("Frame")
+	pnl.Size = UDim2.new(1, -20, 1, -90)
+	pnl.Position = UDim2.new(0, 10, 0, 85)
+	pnl.BackgroundTransparency = 1
+	pnl.Visible = false
+	pnl.Parent = frame
+	return pnl
 end
 
-local movementPanel = panelsFolder.MovimentaçãoPanel
-local functionsPanel = panelsFolder.FunçõesPanel
-local extrasPanel = panelsFolder.ExtrasPanel
+-- Abas e seus painéis
+tabs.Movimento = createTab("Movimento", 10)
+tabs.Funcoes = createTab("Funções", 130)
+tabs.Extras = createTab("Extras", 250)
 
--- Movimento Panel: Velocidade e Pulo
-local speedLabel, speedPlus, speedMinus = createSlider("Velocidade", 10, speed, 0, 200, movementPanel, function(val)
-    speed = val
-    humanoid.WalkSpeed = speed
+panels.Movimento = createPanel()
+panels.Funcoes = createPanel()
+panels.Extras = createPanel()
+
+-- Função para mostrar aba correta
+local function showTab(tabName)
+	for _, pnl in pairs(panels) do
+		pnl.Visible = false
+	end
+	panels[tabName].Visible = true
+	for _, btn in pairs(tabs) do
+		btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+	end
+	tabs[tabName].BackgroundColor3 = Color3.fromRGB(100, 149, 237)
+end
+
+showTab("Movimento")
+
+for name, btn in pairs(tabs) do
+	btn.MouseButton1Click:Connect(function()
+		showTab(name)
+	end)
+end
+
+-- Movimentação: Velocidade e Pulo
+
+local speed = 16
+local jump = 50
+
+local function addSlider(parent, labelText, y, initialValue, onChange)
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -80, 0, 30)
+	label.Position = UDim2.new(0, 10, 0, y)
+	label.BackgroundTransparency = 1
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 18
+	label.Text = labelText .. ": " .. initialValue
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = parent
+
+	local minus = Instance.new("TextButton")
+	minus.Size = UDim2.new(0, 30, 0, 30)
+	minus.Position = UDim2.new(1, -70, 0, y)
+	minus.BackgroundColor3 = Color3.fromRGB(178, 34, 34)
+	minus.Text = "-"
+	minus.Font = Enum.Font.GothamBold
+	minus.TextSize = 20
+	minus.TextColor3 = Color3.new(1, 1, 1)
+	minus.Parent = parent
+
+	local plus = Instance.new("TextButton")
+	plus.Size = UDim2.new(0, 30, 0, 30)
+	plus.Position = UDim2.new(1, -35, 0, y)
+	plus.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
+	plus.Text = "+"
+	plus.Font = Enum.Font.GothamBold
+	plus.TextSize = 20
+	plus.TextColor3 = Color3.new(1, 1, 1)
+	plus.Parent = parent
+
+	minus.MouseButton1Click:Connect(function()
+		if initialValue > 0 then
+			initialValue = initialValue - 1
+			label.Text = labelText .. ": " .. initialValue
+			onChange(initialValue)
+		end
+	end)
+	plus.MouseButton1Click:Connect(function()
+		initialValue = initialValue + 1
+		label.Text = labelText .. ": " .. initialValue
+		onChange(initialValue)
+	end)
+
+	return label, plus, minus
+end
+
+local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid") or player.CharacterAdded:Wait():WaitForChild("Humanoid")
+
+local speedLabel = addSlider(panels.Movimento, "Velocidade", 10, speed, function(v)
+	if humanoid then humanoid.WalkSpeed = v end
+	speed = v
 end)
 
-local jumpLabel, jumpPlus, jumpMinus = createSlider("Pulo", 60, jump, 0, 200, movementPanel, function(val)
-    jump = val
-    humanoid.JumpPower = jump
+local jumpLabel = addSlider(panels.Movimento, "Pulo", 60, jump, function(v)
+	if humanoid then humanoid.JumpPower = v end
+	jump = v
 end)
 
--- Funções Panel: Gravidade Nula e Noclip
-local zeroGravBtn = createToggleButton("Gravidade Nula", 10, functionsPanel, zeroGravEnabled, function(state)
-    zeroGravEnabled = state
-    toggleZeroGravity(state)
+if humanoid then
+	humanoid.WalkSpeed = speed
+	humanoid.JumpPower = jump
+end
+
+-- Funções: Fly e Noclip
+
+local flyEnabled = false
+local noclipEnabled = false
+local bodyGyro, bodyVelocity
+
+local flyBtn = Instance.new("TextButton")
+flyBtn.Size = UDim2.new(0.8, 0, 0, 35)
+flyBtn.Position = UDim2.new(0.1, 0, 0, 10)
+flyBtn.BackgroundColor3 = Color3.fromRGB(100, 149, 237)
+flyBtn.TextColor3 = Color3.new(1, 1, 1)
+flyBtn.Font = Enum.Font.GothamBold
+flyBtn.TextSize = 20
+flyBtn.Text = "Fly: OFF"
+flyBtn.Parent = panels.Funcoes
+
+local noclipBtn = Instance.new("TextButton")
+noclipBtn.Size = UDim2.new(0.8, 0, 0, 35)
+noclipBtn.Position = UDim2.new(0.1, 0, 0, 60)
+noclipBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+noclipBtn.TextColor3 = Color3.new(1, 1, 1)
+noclipBtn.Font = Enum.Font.GothamBold
+noclipBtn.TextSize = 20
+noclipBtn.Text = "Noclip: OFF"
+noclipBtn.Parent = panels.Funcoes
+
+local uis = game:GetService("UserInputService")
+local rs = game:GetService("RunService")
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local function toggleFly(state)
+	if state then
+		if not bodyGyro then
+			bodyGyro = Instance.new("BodyGyro", humanoidRootPart)
+			bodyGyro.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+		end
+		if not bodyVelocity then
+			bodyVelocity = Instance.new("BodyVelocity", humanoidRootPart)
+			bodyVelocity.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+		end
+		humanoid.PlatformStand = true
+	else
+		if bodyGyro then
+			bodyGyro:Destroy()
+			bodyGyro = nil
+		end
+		if bodyVelocity then
+			bodyVelocity:Destroy()
+			bodyVelocity = nil
+		end
+		humanoid.PlatformStand = false
+	end
+end
+
+flyBtn.MouseButton1Click:Connect(function()
+	flyEnabled = not flyEnabled
+	flyBtn.Text = "Fly: " .. (flyEnabled and "ON" or "OFF")
+	toggleFly(flyEnabled)
 end)
 
-local noclipBtn = createToggleButton("Noclip", 60, functionsPanel, noclipEnabled, function(state)
-    noclipEnabled = state
-    toggleNoclip(state)
+noclipBtn.MouseButton1Click:Connect(function()
+	noclipEnabled = not noclipEnabled
+	noclipBtn.Text = "Noclip: " .. (noclipEnabled and "ON" or "OFF")
 end)
 
--- Extras Panel: FPS Unlocker, Kill Aura e Teleport Tool
-local fpsBtn = createToggleButton("FPS Unlocker", 10, extrasPanel, fpsUnlockerEnabled, function(state)
-    fpsUnlockerEnabled = state
-    toggleFPSUnlocker(state)
+rs.Heartbeat:Connect(function()
+	if flyEnabled and bodyGyro and bodyVelocity then
+		local move = Vector3.new()
+		local cam = workspace.CurrentCamera
+		if uis:IsKeyDown(Enum.KeyCode.W) then
+			move += cam.CFrame.LookVector
+		end
+		if uis:IsKeyDown(Enum.KeyCode.S) then
+			move -= cam.CFrame.LookVector
+		end
+		if uis:IsKeyDown(Enum.KeyCode.A) then
+			move -= cam.CFrame.RightVector
+		end
+		if uis:IsKeyDown(Enum.KeyCode.D) then
+			move += cam.CFrame.RightVector
+		end
+		if uis:IsKeyDown(Enum.KeyCode.Space) then
+			move += Vector3.new(0,1,0)
+		end
+		if uis:IsKeyDown(Enum.KeyCode.LeftShift) then
+			move -= Vector3.new(0,1,0)
+		end
+		if move.Magnitude > 0 then
+			move = move.Unit * 50
+		end
+		bodyVelocity.Velocity = move
+		bodyGyro.CFrame = cam.CFrame
+	end
+	if noclipEnabled then
+		for _, part in pairs(character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	else
+		for _, part in pairs(character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = true
+			end
+		end
+	end
 end)
 
-local killAuraBtn = createToggleButton("Kill Aura", 60, extrasPanel, killAuraEnabled, function(state)
-    killAuraEnabled = state
-    if state then
-        coroutine.wrap(runKillAura)()
-    end
+-- Extras: FPS Unlocker e Kill Aura
+
+local fpsUnlockerEnabled = false
+local killAuraEnabled = false
+
+local fpsBtn = Instance.new("TextButton")
+fpsBtn.Size = UDim2.new(0.8, 0, 0, 35)
+fpsBtn.Position = UDim2.new(0.1, 0, 0, 10)
+fpsBtn.BackgroundColor3 = Color3.fromRGB(60, 179, 113)
+fpsBtn.TextColor3 = Color3.new(1, 1, 1)
+fpsBtn.Font = Enum.Font.GothamBold
+fpsBtn.TextSize = 20
+fpsBtn.Text = "FPS Unlocker: OFF"
+fpsBtn.Parent = panels.Extras
+
+local killBtn = Instance.new("TextButton")
+killBtn.Size = UDim2.new(0.8, 0, 0, 35)
+killBtn.Position = UDim2.new(0.1, 0, 0, 60)
+killBtn.BackgroundColor3 = Color3.fromRGB(178, 34, 34)
+killBtn.TextColor3 = Color3.new(1, 1, 1)
+killBtn.Font = Enum.Font.GothamBold
+killBtn.TextSize = 20
+killBtn.Text = "Kill Aura: OFF"
+killBtn.Parent = panels.Extras
+
+fpsBtn.MouseButton1Click:Connect(function()
+	fpsUnlockerEnabled = not fpsUnlockerEnabled
+	fpsBtn.Text = "FPS Unlocker: " .. (fpsUnlockerEnabled and "ON" or "OFF")
+	if fpsUnlockerEnabled then
+		setfpscap(1000) -- se a função estiver disponível
+	else
+		setfpscap(60)
+	end
 end)
 
-local tpBtn = createToggleButton("TP Tool 🧭", 110, extrasPanel, tpToolEnabled, function(state)
-    tpToolEnabled = state
-    if state then
-        equipTpTool()
-    else
-        removeTpTool()
-    end
+local function flingPlayer(player)
+	local char = player.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		local hrp = char.HumanoidRootPart
+		hrp.Velocity = Vector3.new(0, 100, 0)
+	end
+end
+
+local function getPlayersInRange(range)
+	local playersInRange = {}
+	for _, p in pairs(game.Players:GetPlayers()) do
+		if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (p.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+			if dist <= range then
+				table.insert(playersInRange, p)
+			end
+		end
+	end
+	return playersInRange
+end
+
+killBtn.MouseButton1Click:Connect(function()
+	killAuraEnabled = not killAuraEnabled
+	killBtn.Text = "Kill Aura: " .. (killAuraEnabled and "ON" or "OFF")
 end)
 
--- Atualizar noclip sempre ativo
-RunService.Stepped:Connect(function()
-    if noclipEnabled then
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
-    end
+rs.Heartbeat:Connect(function()
+	if killAuraEnabled then
+		local playersAround = getPlayersInRange(10)
+		for _, target in pairs(playersAround) do
+			flingPlayer(target)
+		end
+	end
 end)
-
--- Resetar personagem
-LocalPlayer.CharacterAdded:Connect(function(char)
-    character = char
-    humanoid = character:WaitForChild("Humanoid")
-    hrp = character:WaitForChild("HumanoidRootPart")
-    workspace.Gravity = gravityOriginal
-    zeroGravEnabled = false
-    noclipEnabled = false
-    fpsUnlockerEnabled = false
-    killAuraEnabled = false
-    tpToolEnabled = false
-    removeTpTool()
-end)
-
-humanoid.WalkSpeed = speed
-humanoid.JumpPower = jump
-
-return gui
