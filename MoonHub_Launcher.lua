@@ -1,87 +1,105 @@
--- Moon Hub Launcher 🌙 - Estilo KRNL
+-- Moon Hub🌙 Launcher Moderno - Estilo KRNL
 
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
-gui.Name = "MoonHubLauncherGui"
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "MoonHubLauncher"
 gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 450, 0, 300)
-frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 112)
-frame.BackgroundTransparency = 0.2
-frame.BorderSizePixel = 0
-frame.Parent = gui
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 420, 0, 260)
+main.Position = UDim2.new(0.5, -210, 0.5, -130)
+main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+
+local corner = Instance.new("UICorner", main)
+corner.CornerRadius = UDim.new(0, 12)
 
 -- Título
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundTransparency = 1
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -50, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 10)
 title.Text = "Moon Hub🌙"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
 title.Font = Enum.Font.GothamBold
-title.TextSize = 30
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Parent = frame
+title.BackgroundTransparency = 1
 
 -- Subtítulo
-local subtitle = Instance.new("TextLabel")
-subtitle.Size = UDim2.new(1, 0, 0, 25)
-subtitle.Position = UDim2.new(0, 0, 0, 40)
-subtitle.BackgroundTransparency = 1
-subtitle.Text = "Escolha Sua Versão Preferida"
+local subtitle = Instance.new("TextLabel", main)
+subtitle.Size = UDim2.new(1, -20, 0, 30)
+subtitle.Position = UDim2.new(0, 10, 0, 50)
+subtitle.Text = "Escolha sua versão preferida"
+subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+subtitle.TextScaled = true
 subtitle.Font = Enum.Font.Gotham
-subtitle.TextSize = 20
-subtitle.TextColor3 = Color3.new(1, 1, 1)
-subtitle.Parent = frame
+subtitle.BackgroundTransparency = 1
 
--- Botão Versão com Abas
-local btnAbas = Instance.new("TextButton")
-btnAbas.Size = UDim2.new(0.8, 0, 0, 50)
-btnAbas.Position = UDim2.new(0.1, 0, 0, 90)
-btnAbas.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-btnAbas.TextColor3 = Color3.new(1, 1, 1)
-btnAbas.Font = Enum.Font.GothamBold
-btnAbas.TextSize = 24
-btnAbas.Text = "Versão Com Abas"
-btnAbas.Parent = frame
+-- Botão: Simples
+local simpleBtn = Instance.new("TextButton", main)
+simpleBtn.Size = UDim2.new(0.5, -15, 0, 40)
+simpleBtn.Position = UDim2.new(0, 10, 0, 100)
+simpleBtn.Text = "Versão Simples"
+simpleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+simpleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+simpleBtn.Font = Enum.Font.Gotham
+simpleBtn.TextScaled = true
+Instance.new("UICorner", simpleBtn)
 
--- Botão Versão Simples
-local btnSimples = Instance.new("TextButton")
-btnSimples.Size = UDim2.new(0.8, 0, 0, 50)
-btnSimples.Position = UDim2.new(0.1, 0, 0, 160)
-btnSimples.BackgroundColor3 = Color3.fromRGB(100, 149, 237)
-btnSimples.TextColor3 = Color3.new(1, 1, 1)
-btnSimples.Font = Enum.Font.GothamBold
-btnSimples.TextSize = 24
-btnSimples.Text = "Versão Simples"
-btnSimples.Parent = frame
+-- Botão: Com Abas
+local tabsBtn = Instance.new("TextButton", main)
+tabsBtn.Size = UDim2.new(0.5, -15, 0, 40)
+tabsBtn.Position = UDim2.new(0.5, 5, 0, 100)
+tabsBtn.Text = "Versão Com Abas"
+tabsBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tabsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+tabsBtn.Font = Enum.Font.Gotham
+tabsBtn.TextScaled = true
+Instance.new("UICorner", tabsBtn)
 
--- Créditos
-local credits = Instance.new("TextLabel")
-credits.Size = UDim2.new(1, 0, 0, 20)
-credits.Position = UDim2.new(0, 0, 1, -25)
-credits.BackgroundTransparency = 1
-credits.Text = "© Miguel"
-credits.Font = Enum.Font.GothamItalic
-credits.TextSize = 16
-credits.TextColor3 = Color3.new(1, 1, 1)
-credits.TextTransparency = 0.5
-credits.Parent = frame
+-- Botão de Fechar
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "🌙"
+closeBtn.Font = Enum.Font.Gotham
+closeBtn.TextScaled = true
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Instance.new("UICorner", closeBtn)
 
--- Função para fechar launcher ao abrir um script
-local function closeLauncher()
-    gui.Enabled = false
-end
+-- Botão de Reabrir
+local reopenBtn = Instance.new("TextButton", gui)
+reopenBtn.Size = UDim2.new(0, 40, 0, 40)
+reopenBtn.Position = UDim2.new(0, 10, 1, -50)
+reopenBtn.Text = "🌙"
+reopenBtn.Font = Enum.Font.Gotham
+reopenBtn.TextScaled = true
+reopenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+reopenBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Instance.new("UICorner", reopenBtn)
+reopenBtn.Visible = false
 
--- Eventos dos botões
-btnAbas.MouseButton1Click:Connect(function()
-    closeLauncher()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
+-- Ações dos Botões
+simpleBtn.MouseButton1Click:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
+	gui:Destroy()
 end)
 
-btnSimples.MouseButton1Click:Connect(function()
-    closeLauncher()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
+tabsBtn.MouseButton1Click:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
+	gui:Destroy()
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+	main.Visible = false
+	reopenBtn.Visible = true
+end)
+
+reopenBtn.MouseButton1Click:Connect(function()
+	main.Visible = true
+	reopenBtn.Visible = false
 end)
