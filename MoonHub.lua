@@ -1,176 +1,34 @@
--- Moon Hub🌙 - Painel VIP Galáctico
--- Desenvolvido exclusivamente para Miguelh009991
+-- Moon Hub🌙 (Simples) - Interface Moderna Atualizada e Estendida local player = game.Players.LocalPlayer local mouse = player:GetMouse()
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local mouse = player:GetMouse()
+-- Criar GUI local gui = Instance.new("ScreenGui", game.CoreGui) gui.Name = "MoonHub_Simples"
 
-local MoonHub = Instance.new("ScreenGui", game.CoreGui)
-MoonHub.Name = "MoonHub🌙"
+-- Botão para abrir local openButton = Instance.new("ImageButton", gui) openButton.Size = UDim2.new(0, 50, 0, 50) openButton.Position = UDim2.new(0, 10, 0.5, -25) openButton.Image = "rbxassetid://15015056434" openButton.BackgroundTransparency = 1 openButton.Visible = true
 
-local moonButton = Instance.new("ImageButton", MoonHub)
-moonButton.Size = UDim2.new(0, 50, 0, 50)
-moonButton.Position = UDim2.new(0.92, 0, 0.5, -25)
-moonButton.BackgroundTransparency = 1
-moonButton.Image = "rbxassetid://6031091000"
+-- Janela principal local main = Instance.new("Frame", gui) main.Size = UDim2.new(0, 460, 0, 540) main.Position = UDim2.new(0.5, -230, 0.5, -270) main.BackgroundColor3 = Color3.fromRGB(25, 25, 25) main.BorderSizePixel = 0 main.Visible = false main.Active = true main.Draggable = true main.ClipsDescendants = true main.BackgroundTransparency = 0.1 main.ZIndex = 2 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
-local panel = Instance.new("Frame", MoonHub)
-panel.Size = UDim2.new(0, 400, 0, 900)
-panel.Position = UDim2.new(0.5, -200, 0.5, -450)
-panel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-panel.Visible = false
-panel.BorderSizePixel = 0
-panel.AnchorPoint = Vector2.new(0.5, 0.5)
-Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
+-- Título local title = Instance.new("TextLabel", main) title.Size = UDim2.new(1, 0, 0, 40) title.BackgroundTransparency = 1 title.Text = "Moon Hub🌙 - Versão Completa" title.TextColor3 = Color3.fromRGB(255, 255, 255) title.Font = Enum.Font.GothamSemibold title.TextSize = 24
 
-local title = Instance.new("TextLabel", panel)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "Moon Hub🌙"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Font = Enum.Font.GothamBold
-title.TextScaled = true
+-- Botão de fechar local close = Instance.new("TextButton", main) close.Text = "X" close.Size = UDim2.new(0, 30, 0, 30) close.Position = UDim2.new(1, -35, 0, 5) close.BackgroundColor3 = Color3.fromRGB(60, 60, 60) close.TextColor3 = Color3.fromRGB(255, 255, 255) close.Font = Enum.Font.GothamBold close.TextSize = 16 Instance.new("UICorner", close).CornerRadius = UDim.new(0, 8)
 
-local closeButton = Instance.new("TextButton", panel)
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.Text = "❌"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextScaled = true
-Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 8)
+-- Container dos botões local buttonFrame = Instance.new("ScrollingFrame", main) buttonFrame.Size = UDim2.new(1, -20, 1, -60) buttonFrame.Position = UDim2.new(0, 10, 0, 50) buttonFrame.BackgroundTransparency = 1 buttonFrame.CanvasSize = UDim2.new(0, 0, 2, 0) buttonFrame.ScrollBarThickness = 6
 
-moonButton.MouseButton1Click:Connect(function()
-	panel.Visible = not panel.Visible
-end)
+local layout = Instance.new("UIListLayout", buttonFrame) layout.Padding = UDim.new(0, 10) layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-closeButton.MouseButton1Click:Connect(function()
-	panel.Visible = false
-end)
+local function createButton(text, callback) local btn = Instance.new("TextButton", buttonFrame) btn.Size = UDim2.new(1, 0, 0, 40) btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40) btn.TextColor3 = Color3.fromRGB(255, 255, 255) btn.Text = text btn.Font = Enum.Font.Gotham btn.TextSize = 16 btn.AutoButtonColor = true Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8) btn.MouseButton1Click:Connect(callback) end
 
--- Comandos de Jogador
-local function criarBotao(nome, pos, func)
-	local btn = Instance.new("TextButton", panel)
-	btn.Size = UDim2.new(0.5, -10, 0, 30)
-	btn.Position = pos
-	btn.Text = nome
-	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.Gotham
-	btn.TextScaled = true
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-	btn.MouseButton1Click:Connect(func)
-end
+-- Funções padrão createButton("🛰️ Gravidade Zero (Ativar)", function() workspace.Gravity = 0 end) createButton("⛔ Desativar Gravidade", function() workspace.Gravity = 196.2 end)
 
-criarBotao("⚡ Velocidade", UDim2.new(0, 10, 0, 50), function()
-	player.Character.Humanoid.WalkSpeed = 100
-end)
+-- Noclip ON/OFF local noclipAtivo = false local noclipCon createButton("🚪 Noclip (ON)", function() if noclipCon then noclipCon:Disconnect() end noclipAtivo = true noclipCon = game:GetService("RunService").Stepped:Connect(function() if noclipAtivo and player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid:ChangeState(11) end end) end) createButton("🚫 Noclip (OFF)", function() noclipAtivo = false if noclipCon then noclipCon:Disconnect() end end)
 
-criarBotao("🌀 Pulo", UDim2.new(0.5, 10, 0, 50), function()
-	player.Character.Humanoid.JumpPower = 150
-end)
+-- Kill Aura createButton("🔁 Kill Aura", function() spawn(function() while wait(0.3) do for _, v in pairs(workspace:GetChildren()) do if v:IsA("Model") and v ~= player.Character and v:FindFirstChild("HumanoidRootPart") then if (v.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude < 10 then firetouchinterest(player.Character:FindFirstChild("HumanoidRootPart"), v:FindFirstChild("HumanoidRootPart"), 0) firetouchinterest(player.Character:FindFirstChild("HumanoidRootPart"), v:FindFirstChild("HumanoidRootPart"), 1) end end end end end) end)
 
-criarBotao("🕶️ Invisível", UDim2.new(0, 10, 0, 90), function()
-	for _, part in pairs(player.Character:GetDescendants()) do
-		if part:IsA("BasePart") then part.Transparency = 1 end
-	end
-end)
+-- TP Tool createButton("📍 Tp Tool (ON)", function() local tool = Instance.new("Tool", player.Backpack) tool.RequiresHandle = false tool.Name = "TP Tool" tool.Activated:Connect(function() if mouse.Target then player.Character:MoveTo(mouse.Hit.p) end end) end) createButton("📤 Tp Tool (OFF)", function() local tool = player.Backpack:FindFirstChild("TP Tool") if tool then tool:Destroy() end end)
 
-criarBotao("🔄 Reset", UDim2.new(0.5, 10, 0, 90), function()
-	player:Kick("Reset via Moon Hub🌙")
-end)
+-- Vida e reset createButton("❤️ Curar Vida", function() if player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth end end) createButton("🔁 Reset Rápido", function() player.Character:BreakJoints() end)
 
--- Comandos de Ambiente
-criarBotao("🌌 Gravidade Zero", UDim2.new(0, 10, 0, 140), function()
-	game.Workspace.Gravity = 0
-end)
+-- Velocidade e pulo createButton("⚡ Velocidade +", function() player.Character.Humanoid.WalkSpeed += 10 end) createButton("⚡ Velocidade -", function() player.Character.Humanoid.WalkSpeed -= 10 end) createButton("🦘 Pulo +", function() player.Character.Humanoid.JumpPower += 10 end) createButton("🦘 Pulo -", function() player.Character.Humanoid.JumpPower -= 10 end)
 
-criarBotao("🌍 Gravidade Normal", UDim2.new(0.5, 10, 0, 140), function()
-	game.Workspace.Gravity = 196.2
-end)
+-- Giro local girarCon = nil local velocidadeGiro = 2 createButton("🔄 Ativar Giro", function() if girarCon then girarCon:Disconnect() end girarCon = game:GetService("RunService").RenderStepped:Connect(function() if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then local root = player.Character.HumanoidRootPart root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(velocidadeGiro), 0) end end) end) createButton("📉 Giro - Lento", function() velocidadeGiro = math.max(1, velocidadeGiro - 1) end) createButton("📈 Giro - Rápido", function() velocidadeGiro = velocidadeGiro + 1 end) createButton("🛑 Parar Giro", function() if girarCon then girarCon:Disconnect() girarCon = nil end end)
 
-criarBotao("🌑 Escurecer", UDim2.new(0, 10, 0, 180), function()
-	game.Lighting.Brightness = 0
-	game.Lighting.ClockTime = 0
-end)
+-- Interface controles openButton.MouseButton1Click:Connect(function() main.Visible = true openButton.Visible = false end) close.MouseButton1Click:Connect(function() main.Visible = false openButton.Visible = true end)
 
-criarBotao("☀️ Clarear", UDim2.new(0.5, 10, 0, 180), function()
-	game.Lighting.Brightness = 2
-	game.Lighting.ClockTime = 14
-end)
-
--- Comandos Visuais
-criarBotao("🔍 Zoom Máx", UDim2.new(0, 10, 0, 230), function()
-	player.CameraMaxZoomDistance = 100
-end)
-
-criarBotao("🔎 Zoom Mín", UDim2.new(0.5, 10, 0, 230), function()
-	player.CameraMaxZoomDistance = 10
-end)
-
-criarBotao("🟢 Visão Noturna", UDim2.new(0, 10, 0, 270), function()
-	game.Lighting.ColorShift_Bottom = Color3.fromRGB(0, 255, 0)
-	game.Lighting.ColorShift_Top = Color3.fromRGB(0, 255, 0)
-end)
-
-criarBotao("🔁 Reset Visual", UDim2.new(0.5, 10, 0, 270), function()
-	game.Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
-	game.Lighting.ColorShift_Top = Color3.fromRGB(0, 0, 0)
-end)
-
--- Comandos de Diversão
-criarBotao("💥 Explosão", UDim2.new(0, 10, 0, 320), function()
-	local explosion = Instance.new("Explosion")
-	explosion.Position = player.Character.HumanoidRootPart.Position
-	explosion.BlastRadius = 10
-	explosion.BlastPressure = 500000
-	explosion.Parent = game.Workspace
-end)
-
-criarBotao("🕺 Dança", UDim2.new(0.5, 10, 0, 320), function()
-	local anim = Instance.new("Animation")
-	anim.AnimationId = "rbxassetid://507777826"
-	local track = player.Character.Humanoid:LoadAnimation(anim)
-	track:Play()
-end)
-
-criarBotao("🔄 Girar", UDim2.new(0, 10, 0, 360), function()
-	while true do
-		player.Character:SetPrimaryPartCFrame(player.Character.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(10), 0))
-		wait(0.1)
-	end
-end)
-
-criarBotao("🔊 Som Cósmico", UDim2.new(0.5, 10, 0, 360), function()
-	local sound = Instance.new("Sound", player.Character.Head)
-	sound.SoundId = "rbxassetid://9118823105"
-	sound.Volume = 1
-	sound:Play()
-end)
-
--- Comandos VIP
-criarBotao("🛸 Voo VIP", UDim2.new(0, 10, 0, 410), function()
-	local hrp = player.Character:WaitForChild("HumanoidRootPart")
-	local bv = Instance.new("BodyVelocity", hrp)
-	bv.Velocity = Vector3.new(0, 50, 0)
-	bv.MaxForce = Vector3.new(0, math.huge, 0)
-	wait(2)
-	bv:Destroy()
-end)
-
-criarBotao("📍 Teleporte", UDim2.new(0.5, 10, 0, 410), function()
-	player.Character:MoveTo(Vector3.new(0, 100, 0))
-end)
-
-criarBotao("🛠️ Admin Cmds", UDim2.new(0, 10, 0, 450), function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-end)
-
-criarBotao("🧹 Limpar Efeitos", UDim2.new(0.5, 10, 0, 450), function()
-	for _, obj in pairs(player.Character:GetDescendants()) do
-		if obj:IsA("Sound") or obj:IsA("ParticleEmitter") then
-			obj:Destroy()
-		end
-	end
-end)
