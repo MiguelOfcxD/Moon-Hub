@@ -1,165 +1,58 @@
--- MoonHub Simples 🌙 by Miguel
+-- Moon Hub🌙 (Simples) - Interface Moderna Atualizada local player = game.Players.LocalPlayer local mouse = player:GetMouse()
 
-local player = game.Players.LocalPlayer
-local mouse = player:GetMouse()
-local StarterGui = game:GetService("StarterGui")
-local UIS = game:GetService("UserInputService")
+-- Criar GUI local gui = Instance.new("ScreenGui", game.CoreGui) gui.Name = "MoonHub_Simples"
 
--- UI Proteção
-pcall(function() syn.protect_gui(game.CoreGui) end)
+-- Botão para abrir local openButton = Instance.new("ImageButton", gui) openButton.Size = UDim2.new(0, 50, 0, 50) openButton.Position = UDim2.new(0, 10, 0.5, -25) openButton.Image = "rbxassetid://15015056434" -- Ícone de lua openButton.BackgroundTransparency = 1 openButton.Visible = true
 
--- Criação da Interface
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "MoonHub_Simples"
+-- Janela principal local main = Instance.new("Frame", gui) main.Size = UDim2.new(0, 400, 0, 400) main.Position = UDim2.new(0.5, -200, 0.5, -200) main.BackgroundColor3 = Color3.fromRGB(25, 25, 25) main.BorderSizePixel = 0 main.Visible = false main.Active = true main.Draggable = true main.ClipsDescendants = true main.BackgroundTransparency = 0.1 main.ZIndex = 2 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 400, 0, 320)
-Frame.Position = UDim2.new(0.5, -200, 0.5, -160)
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-Frame.BorderSizePixel = 0
-Frame.Active = true
-Frame.Draggable = true
-Frame.BackgroundTransparency = 0.05
+-- Título local title = Instance.new("TextLabel", main) title.Size = UDim2.new(1, 0, 0, 40) title.BackgroundTransparency = 1 title.Text = "Moon Hub🌙" title.TextColor3 = Color3.fromRGB(255, 255, 255) title.Font = Enum.Font.GothamSemibold title.TextSize = 24
 
-local UICorner = Instance.new("UICorner", Frame)
-UICorner.CornerRadius = UDim.new(0, 12)
+-- Botão de fechar local close = Instance.new("TextButton", main) close.Text = "X" close.Size = UDim2.new(0, 30, 0, 30) close.Position = UDim2.new(1, -35, 0, 5) close.BackgroundColor3 = Color3.fromRGB(60, 60, 60) close.TextColor3 = Color3.fromRGB(255, 255, 255) close.Font = Enum.Font.GothamBold close.TextSize = 16 Instance.new("UICorner", close).CornerRadius = UDim.new(0, 8)
 
-local Shadow = Instance.new("ImageLabel", Frame)
-Shadow.Size = UDim2.new(1, 40, 1, 40)
-Shadow.Position = UDim2.new(0, -20, 0, -20)
-Shadow.Image = "rbxassetid://1316045217"
-Shadow.ImageTransparency = 0.7
-Shadow.BackgroundTransparency = 1
+-- Container dos botões local buttonFrame = Instance.new("Frame", main) buttonFrame.Size = UDim2.new(1, -20, 1, -60) buttonFrame.Position = UDim2.new(0, 10, 0, 50) buttonFrame.BackgroundTransparency = 1 local layout = Instance.new("UIListLayout", buttonFrame) layout.Padding = UDim.new(0, 10)
 
-local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.BackgroundTransparency = 1
-Title.Text = "🌙 Moon Hub - Simples"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
+-- Criador de botão local function createButton(text, callback) local btn = Instance.new("TextButton", buttonFrame) btn.Size = UDim2.new(1, 0, 0, 40) btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40) btn.TextColor3 = Color3.fromRGB(255, 255, 255) btn.Text = text btn.Font = Enum.Font.Gotham btn.TextSize = 16 btn.AutoButtonColor = true Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8) btn.MouseButton1Click:Connect(callback) end
 
--- Botão de Fechar
-local CloseButton = Instance.new("TextButton", Frame)
-CloseButton.Size = UDim2.new(0, 30, 0, 30)
-CloseButton.Position = UDim2.new(1, -35, 0, 5)
-CloseButton.Text = "✕"
-CloseButton.Font = Enum.Font.GothamBold
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-CloseButton.BorderSizePixel = 0
-local corner = Instance.new("UICorner", CloseButton)
-corner.CornerRadius = UDim.new(0, 6)
-CloseButton.MouseButton1Click:Connect(function()
-    Frame.Visible = false
-end)
+-- Gravidade Zero createButton("🪐 Gravidade Zero (Ativar)", function() workspace.Gravity = 0 end)
 
--- Botão para abrir novamente
-local OpenButton = Instance.new("TextButton", ScreenGui)
-OpenButton.Size = UDim2.new(0, 120, 0, 35)
-OpenButton.Position = UDim2.new(0, 20, 1, -50)
-OpenButton.Text = "🌙 Abrir MoonHub"
-OpenButton.Font = Enum.Font.GothamBold
-OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-OpenButton.BackgroundColor3 = Color3.fromRGB(50, 50, 80)
-OpenButton.BorderSizePixel = 0
-local corner2 = Instance.new("UICorner", OpenButton)
-corner2.CornerRadius = UDim.new(0, 8)
-OpenButton.MouseButton1Click:Connect(function()
-    Frame.Visible = true
-end)
+createButton("⛔ Desativar Gravidade", function() workspace.Gravity = 196.2 end)
 
--- UIList para os botões
-local ButtonList = Instance.new("UIListLayout", Frame)
-ButtonList.SortOrder = Enum.SortOrder.LayoutOrder
-ButtonList.Padding = UDim.new(0, 6)
+-- Noclip ON/OFF local noclipAtivo = false local noclipCon
 
--- Container
-local Container = Instance.new("Frame", Frame)
-Container.Size = UDim2.new(1, -20, 1, -60)
-Container.Position = UDim2.new(0, 10, 0, 50)
-Container.BackgroundTransparency = 1
+createButton("🚪 Noclip (ON)", function() if noclipCon then noclipCon:Disconnect() end noclipAtivo = true noclipCon = game:GetService("RunService").Stepped:Connect(function() if noclipAtivo and player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid:ChangeState(11) end end) end)
 
-local function criarBotao(nome, callback)
-    local Botao = Instance.new("TextButton")
-    Botao.Size = UDim2.new(1, 0, 0, 30)
-    Botao.Text = nome
-    Botao.BackgroundColor3 = Color3.fromRGB(35, 35, 55)
-    Botao.Font = Enum.Font.Gotham
-    Botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Botao.Parent = Container
-    Instance.new("UICorner", Botao).CornerRadius = UDim.new(0, 6)
-    Botao.MouseButton1Click:Connect(callback)
-end
+createButton("⛔ Noclip (OFF)", function() noclipAtivo = false if noclipCon then noclipCon:Disconnect() end end)
 
--- Variáveis de estado
-local noclipAtivo = false
-local tptoolAtivo = false
+-- Kill Aura createButton("🌀 Kill Aura", function() spawn(function() while true do wait(0.3) for _, v in pairs(workspace:GetChildren()) do if v:IsA("Model") and v ~= player.Character and v:FindFirstChild("HumanoidRootPart") then if (v.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude < 10 then firetouchinterest(player.Character:FindFirstChild("HumanoidRootPart"), v:FindFirstChild("HumanoidRootPart"), 0) firetouchinterest(player.Character:FindFirstChild("HumanoidRootPart"), v:FindFirstChild("HumanoidRootPart"), 1) end end end end end) end)
 
--- Funções
-criarBotao("Gravidade Zero (ON)", function()
-    player.Character:FindFirstChild("Humanoid").UseJumpPower = true
-    player.Character.Humanoid.JumpPower = 200
-end)
+-- TP Tool createButton("🧪 Tp Tool (ON)", function() local tool = Instance.new("Tool", player.Backpack) tool.RequiresHandle = false tool.Name = "TP Tool" tool.Activated:Connect(function() if mouse.Target then player.Character:MoveTo(mouse.Hit.p) end end) end)
 
-criarBotao("Gravidade Normal (OFF)", function()
-    player.Character.Humanoid.JumpPower = 50
-end)
+createButton("🛋️ Tp Tool (OFF)", function() local tool = player.Backpack:FindFirstChild("TP Tool") if tool then tool:Destroy() end end)
 
-criarBotao("Noclip (ON/OFF)", function()
-    noclipAtivo = not noclipAtivo
-end)
+-- Curar Vida createButton("❤️ Curar Vida", function() if player.Character and player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth end end)
 
-game:GetService("RunService").Stepped:Connect(function()
-    if noclipAtivo and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        for _, v in pairs(player.Character:GetDescendants()) do
-            if v:IsA("BasePart") and v.CanCollide == true then
-                v.CanCollide = false
-            end
-        end
-    end
-end)
+-- Reset createButton("🔁 Reset Rápido", function() player.Character:BreakJoints() end)
 
-criarBotao("Kill Aura", function()
-    local hum = player.Character:WaitForChild("HumanoidRootPart")
-    game:GetService("RunService").Heartbeat:Connect(function()
-        for _, v in pairs(game.Players:GetPlayers()) do
-            if v ~= player and v.Character and v.Character:FindFirstChild("Humanoid") then
-                if (v.Character.HumanoidRootPart.Position - hum.Position).Magnitude < 10 then
-                    v.Character.Humanoid:TakeDamage(5)
-                end
-            end
-        end
-    end)
-end)
+-- Velocidade e Pulo createButton("⚡ Velocidade +", function() player.Character.Humanoid.WalkSpeed += 10 end)
 
-criarBotao("TpTool (ON/OFF)", function()
-    tptoolAtivo = not tptoolAtivo
-    local tool = player.Backpack:FindFirstChild("TpTool") or player.Character:FindFirstChild("TpTool")
-    if tptoolAtivo and not tool then
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Tp-tool-script-5767"))()
-    elseif not tptoolAtivo and tool then
-        tool:Destroy()
-    end
-end)
+createButton("⚡ Velocidade -", function() player.Character.Humanoid.WalkSpeed -= 10 end)
 
-criarBotao("Curar Vida", function()
-    if player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth
-    end
-end)
+createButton("🥼 Pulo +", function() player.Character.Humanoid.JumpPower += 10 end)
 
-criarBotao("Reset Rápido", function()
-    player.Character:BreakJoints()
-end)
+createButton("🥼 Pulo -", function() player.Character.Humanoid.JumpPower -= 10 end)
 
--- Créditos
-local credit = Instance.new("TextLabel", Frame)
-credit.Text = "Criado por Miguel"
-credit.Size = UDim2.new(1, -10, 0, 20)
-credit.Position = UDim2.new(0, 10, 1, -25)
-credit.TextColor3 = Color3.fromRGB(180, 180, 180)
-credit.TextScaled = true
-credit.Font = Enum.Font.Gotham
-credit.BackgroundTransparency = 1
+-- Girar personagem local girarCon = nil local velocidadeGiro = 2
+
+createButton("🔄 Ativar Giro", function() if girarCon then girarCon:Disconnect() end girarCon = game:GetService("RunService").RenderStepped:Connect(function() if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then local root = player.Character.HumanoidRootPart root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(velocidadeGiro), 0) end end) end)
+
+createButton("📉 Giro - Lento", function() velocidadeGiro = math.max(1, velocidadeGiro - 1) end)
+
+createButton("📈 Giro - Rápido", function() velocidadeGiro = velocidadeGiro + 1 end)
+
+createButton("❌ Parar Giro", function() if girarCon then girarCon:Disconnect() girarCon = nil end end)
+
+-- Controles principais openButton.MouseButton1Click:Connect(function() main.Visible = true openButton.Visible = false end)
+
+close.MouseButton1Click:Connect(function() main.Visible = false openButton.Visible = true end)
+
