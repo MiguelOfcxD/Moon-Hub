@@ -51,14 +51,12 @@ end
 -- Botão versão COM abas
 local btnAbas = criarBotao("🌌 Versão com Abas", Color3.fromRGB(60, 90, 150), function()
 	main:Destroy()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/main/MoonHub_Abas.lua"))()
-end)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_abas.lua"))()
 
 -- Botão versão SIMPLES
 local btnSimples = criarBotao("🌗 Versão Simples", Color3.fromRGB(90, 60, 130), function()
 	main:Destroy()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/main/MoonHub_Simples.lua"))()
-end)
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/MiguelOfcxD/Moon-Hub/refs/heads/main/MoonHub_Simples.lua"))()
 
 -- Layout
 local layout = Instance.new("UIListLayout", buttonContainer)
