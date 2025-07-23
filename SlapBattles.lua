@@ -1,72 +1,304 @@
--- Moon Hub🌙 - Slap Battles (versão com abas) - by Miguel
 
--- Serviços local Players = game:GetService("Players") local RunService = game:GetService("RunService") local UIS = game:GetService("UserInputService") local RS = game:GetService("ReplicatedStorage") local LP = Players.LocalPlayer
+-- Moon Hub🌙 - Slap Battles Edition (100% Mobile, Moderno e Otimizado)
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local uis = game:GetService("UserInputService")
+local camera = workspace.CurrentCamera
 
-local Char = LP.Character or LP.CharacterAdded:Wait() local HRP = Char:WaitForChild("HumanoidRootPart") local Humanoid = Char:WaitForChild("Humanoid")
+-- Proteção
+pcall(function() setfpscap(999) end)
 
--- Estado local state = { killAura = false, autoSlap = false, speedHack = false, gravity = false, noclip = false, fly = false, godmode = false, antiRagdoll = false, noKnockback = false, }
+-- Interface Principal
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "MoonHubSB"
+ScreenGui.ResetOnSpawn = false
 
-local speedValue = 50 local connectionFly, connectionNoclip
+-- Janela Principal
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 400, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -160)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = false
+MainFrame.ClipsDescendants = true
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.ZIndex = 2
 
--- GUI Principal local gui = Instance.new("ScreenGui", game.CoreGui) gu i.ResetOnSpawn = false gui.Name = "MoonHub_SlapBattles"
+-- UICorner + sombra
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+local shadow = Instance.new("ImageLabel", MainFrame)
+shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+shadow.Size = UDim2.new(1, 40, 1, 40)
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageTransparency = 0.6
+shadow.BackgroundTransparency = 1
+shadow.ZIndex = 1
 
-local main = Instance.new("Frame", gui) main.Size = UDim2.new(0, 380, 0, 400) main.Position = UDim2.new(0.5, -190, 0.5, -200) main.BackgroundColor3 = Color3.fromRGB(25, 25, 25) main.Active = true main.Draggable = true Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+-- Título
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Text = "Moon Hub🌙 - Slap Battles"
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
 
--- Título local title = Instance.new("TextLabel", main) title.Size = UDim2.new(1, -35, 0, 40) title.Position = UDim2.new(0, 10, 0, 0) title.BackgroundTransparency = 1 title.Text = "Moon Hub🌙 - Slap Battles" title.TextColor3 = Color3.new(1, 1, 1) title.Font = Enum.Font.GothamBold title.TextSize = 18
+-- Botão de abrir/fechar
+local ToggleBtn = Instance.new("ImageButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleBtn.Image = "rbxassetid://16002162253"
+ToggleBtn.BackgroundTransparency = 1
+ToggleBtn.ZIndex = 3
 
-local close = Instance.new("TextButton", main) close.Size = UDim2.new(0, 30, 0, 30) close.Position = UDim2.new(1, -35, 0, 5) close.Text = "✕" close.BackgroundColor3 = Color3.fromRGB(40, 40, 40) close.TextColor3 = Color3.fromRGB(255, 100, 100) close.Font = Enum.Font.GothamBold close.TextSize = 18 Instance.new("UICorner", close).CornerRadius = UDim.new(0, 8) close.MouseButton1Click:Connect(function() gui:Destroy() end)
-
--- Abas local abas = {"Combate", "Movimento", "Utilitários"} local atual = "Combate" local botoesAba = {}
-
-for i, nome in ipairs(abas) do local btn = Instance.new("TextButton", main) btn.Size = UDim2.new(0, 100, 0, 30) btn.Position = UDim2.new(0, 10 + (i-1)*110, 0, 50) btn.Text = nome btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35) btn.TextColor3 = Color3.new(1, 1, 1) btn.Font = Enum.Font.Gotham btn.TextSize = 14 Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6) botoesAba[nome] = btn btn.MouseButton1Click:Connect(function() atual = nome updateAbas() end) end
-
-local conteudo = Instance.new("Frame", main) conteudo.Position = UDim2.new(0, 10, 0, 90) conteudo.Size = UDim2.new(1, -20, 1, -100) conteudo.BackgroundTransparency = 1
-
-local function limparConteudo() for _, v in pairs(conteudo:GetChildren()) do v:Destroy() end end
-
-local function criarBotao(nome, ordem, callback) local btn = Instance.new("TextButton", conteudo) btn.Size = UDim2.new(1, 0, 0, 35) btn.Position = UDim2.new(0, 0, 0, (ordem-1)*40) btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40) btn.Text = nome btn.TextColor3 = Color3.new(1, 1, 1) btn.Font = Enum.Font.Gotham btn.TextSize = 14 Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6) btn.MouseButton1Click:Connect(callback) end
-
-function updateAbas() limparConteudo() if atual == "Combate" then criarBotao("Kill Aura (ON/OFF)", 1, function() state.killAura = not state.killAura end) criarBotao("Auto Slap (ON/OFF)", 2, function() state.autoSlap = not state.autoSlap end) criarBotao("Kill All", 3, function() for _, plr in pairs(Players:GetPlayers()) do if plr ~= LP and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then HRP.CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0) local atk = RS:FindFirstChild("Attack") if atk then atk:FireServer(plr.Character) end task.wait(0.2) end end end) criarBotao("God Mode (ON/OFF)", 4, function() state.godmode = not state.godmode end) elseif atual == "Movimento" then criarBotao("Speed Hack (ON/OFF)", 1, function() state.speedHack = not state.speedHack end) criarBotao("Gravidade Zero (ON/OFF)", 2, function() state.gravity = not state.gravity end) criarBotao("Noclip (ON/OFF)", 3, function() state.noclip = not state.noclip end) criarBotao("Fly (ON/OFF)", 4, function() state.fly = not state.fly end) elseif atual == "Utilitários" then criarBotao("Teleportar para jogador", 1, function() local nome = LP:Prompt("Digite o nome do jogador") local alvo = Players:FindFirstChild(nome) if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then HRP.CFrame = alvo.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0) end end) criarBotao("Reset Rápido", 2, function() LP.Character:BreakJoints() end) criarBotao("Anti-Ragdoll (ON/OFF)", 3, function() state.antiRagdoll = not state.antiRagdoll end) criarBotao("No Knockback (ON/OFF)", 4, function() state.noKnockback = not state.noKnockback end) criarBotao("FPS Boost", 5, function() for _, v in pairs(workspace:GetDescendants()) do if v:IsA("Texture") or v:IsA("ParticleEmitter") or v:IsA("Decal") then v:Destroy() end end end) end end
-
-updateAbas()
-
--- Lógicas por frame RunService.Heartbeat:Connect(function() pcall(function() Char = LP.Character or LP.CharacterAdded:Wait() HRP = Char:WaitForChild("HumanoidRootPart") Humanoid = Char:WaitForChild("Humanoid") end)
-
-if state.speedHack then Humanoid.WalkSpeed = speedValue else Humanoid.WalkSpeed = 16 end
-
-if state.killAura then
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LP and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            local dist = (HRP.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-            if dist < 10 then
-                local atk = RS:FindFirstChild("Attack")
-                if atk then atk:FireServer(plr.Character) end
-            end
-        end
-    end
-end
-
-if state.autoSlap then
-    local atk = RS:FindFirstChild("Attack")
-    if atk then atk:FireServer() end
-end
-
-if state.gravity then workspace.Gravity = 2 else workspace.Gravity = 196.2 end
-
-if state.noclip and not connectionNoclip then
-    connectionNoclip = RunService.Stepped:Connect(function()
-        for _, part in pairs(Char:GetDescendants()) do
-            if part:IsA("BasePart") and part.CanCollide == true then
-                part.CanCollide = false
-            end
-        end
-    end)
-elseif not state.noclip and connectionNoclip then
-    connectionNoclip:Disconnect()
-    connectionNoclip = nil
-end
-
+ToggleBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
 end)
 
-print("Moon Hub🌙 carregado com abas!")
+-- Abas
+local Tabs = {}
+local TabButtons = {}
 
+local TabFrame = Instance.new("Frame", MainFrame)
+TabFrame.Size = UDim2.new(0, 400, 0, 30)
+TabFrame.Position = UDim2.new(0, 0, 0, 30)
+TabFrame.BackgroundTransparency = 1
+TabFrame.ZIndex = 2
+
+local function createTab(name)
+	local btn = Instance.new("TextButton", TabFrame)
+	btn.Size = UDim2.new(0, 100, 0, 30)
+	btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.Gotham
+	btn.TextScaled = true
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+	local frame = Instance.new("Frame", MainFrame)
+	frame.Size = UDim2.new(1, 0, 1, -60)
+	frame.Position = UDim2.new(0, 0, 0, 60)
+	frame.BackgroundTransparency = 1
+	frame.Visible = false
+
+	table.insert(TabButtons, btn)
+	Tabs[name] = frame
+
+	btn.MouseButton1Click:Connect(function()
+		for _, f in pairs(Tabs) do f.Visible = false end
+		for _, b in pairs(TabButtons) do b.BackgroundColor3 = Color3.fromRGB(30, 30, 30) end
+		frame.Visible = true
+		btn.BackgroundColor3 = Color3.fromRGB(0, 85, 255)
+	end)
+
+	return frame
+end
+
+local combate = createTab("Combate")
+local move = createTab("Movimentação")
+local util = createTab("Utilitários")
+local players = createTab("Players")
+
+local function createLayout(container)
+	local UIListLayout = Instance.new("UIListLayout", container)
+	UIListLayout.Padding = UDim.new(0, 6)
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local padding = Instance.new("UIPadding", container)
+	padding.PaddingTop = UDim.new(0, 10)
+	padding.PaddingLeft = UDim.new(0, 10)
+	padding.PaddingRight = UDim.new(0, 10)
+end
+
+createLayout(combate)
+createLayout(move)
+createLayout(util)
+createLayout(players)
+
+local function createToggle(parent, nome, callback)
+	local estado = false
+	local btn = Instance.new("TextButton", parent)
+	btn.Size = UDim2.new(1, -20, 0, 40)
+	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	btn.Text = nome .. ": OFF"
+	btn.TextColor3 = Color3.fromRGB(255, 0, 0)
+	btn.Font = Enum.Font.Gotham
+	btn.TextScaled = true
+	btn.AutoButtonColor = false
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+	btn.MouseButton1Click:Connect(function()
+		estado = not estado
+		btn.Text = nome .. (estado and ": ON" or ": OFF")
+		btn.TextColor3 = estado and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+		callback(estado)
+	end)
+end
+
+createToggle(combate, "Kill Aura", function(on)
+	if on then
+		_G.KillAura = true
+		task.spawn(function()
+			while _G.KillAura do
+				for _, v in pairs(game.Players:GetPlayers()) do
+					if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+						if (v.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude < 15 then
+							firetouchinterest(v.Character.HumanoidRootPart, player.Character:FindFirstChild("Slap"), 0)
+							firetouchinterest(v.Character.HumanoidRootPart, player.Character:FindFirstChild("Slap"), 1)
+						end
+					end
+				end
+				wait(0.2)
+			end
+		end)
+	else
+		_G.KillAura = false
+	end
+end)
+
+createToggle(combate, "Auto Slap", function(on)
+	if on then
+		_G.AutoSlap = true
+		task.spawn(function()
+			while _G.AutoSlap do
+				local slap = player.Character and player.Character:FindFirstChild("Slap")
+				if slap then
+					for _, v in pairs(game.Players:GetPlayers()) do
+						if v ~= player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+							if (v.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude < 15 then
+								firetouchinterest(v.Character.HumanoidRootPart, slap, 0)
+								firetouchinterest(v.Character.HumanoidRootPart, slap, 1)
+							end
+						end
+					end
+				end
+				wait(0.2)
+			end
+		end)
+	else
+		_G.AutoSlap = false
+	end
+end)
+
+createToggle(move, "Speed Hack", function(on)
+	if on then
+		_G.MoonSpeed = true
+		player.Character.Humanoid.WalkSpeed = 50
+	else
+		_G.MoonSpeed = false
+		player.Character.Humanoid.WalkSpeed = 16
+	end
+end)
+
+
+-- Continuação: outras funções
+createToggle(move, "High Jump", function(on)
+	if on then
+		player.Character.Humanoid.JumpPower = 120
+	else
+		player.Character.Humanoid.JumpPower = 50
+	end
+end)
+
+createToggle(move, "Gravidade Zero", function(on)
+	workspace.Gravity = on and 0 or 196.2
+end)
+
+createToggle(move, "Noclip", function(on)
+	_G.NoclipSB = on
+	if on then
+		task.spawn(function()
+			while _G.NoclipSB do
+				pcall(function()
+					player.Character.Humanoid:ChangeState(11)
+				end)
+				task.wait()
+			end
+		end)
+	end
+end)
+
+createToggle(util, "TpTool", function(on)
+	if on then
+		local tool = Instance.new("Tool", player.Backpack)
+		tool.RequiresHandle = false
+		tool.Name = "TpTool"
+		tool.Activated:Connect(function()
+			if mouse then
+				player.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+			end
+		end)
+	else
+		for _, v in pairs(player.Backpack:GetChildren()) do
+			if v.Name == "TpTool" then v:Destroy() end
+		end
+	end
+end)
+
+createToggle(util, "Curar Vida", function(on)
+	if on then
+		pcall(function()
+			player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth
+		end)
+	end
+end)
+
+createToggle(util, "Reset Rápido", function(on)
+	if on then
+		player.Character:BreakJoints()
+	end
+end)
+
+createToggle(util, "Anti-Kick", function(on)
+	if on then
+		local mt = getrawmetatable(game)
+		local old; old = hookfunction(mt.__namecall, newcclosure(function(self, ...)
+			local args = {...}
+			if getnamecallmethod() == "Kick" then
+				return
+			end
+			return old(self, unpack(args))
+		end))
+	end
+end)
+
+createToggle(players, "Auto Rejoin", function(on)
+	if on then
+		game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(state)
+			if state == Enum.TeleportState.Failed then
+				game:GetService("TeleportService"):Teleport(game.PlaceId)
+			end
+		end)
+	end
+end)
+
+createToggle(players, "Server Hop", function(on)
+	if on then
+		local ts = game:GetService("TeleportService")
+		local servers = {}
+		local HttpService = game:GetService("HttpService")
+
+		local req = game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?limit=100")
+		local data = HttpService:JSONDecode(req)
+		for _, v in pairs(data.data) do
+			if v.playing < v.maxPlayers then
+				table.insert(servers, v.id)
+			end
+		end
+		ts:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], player)
+	end
+end)
+
+createToggle(players, "Hide Name", function(on)
+	if on then
+		pcall(function()
+			player.Character.Head:FindFirstChild("Nametag"):Destroy()
+		end)
+	end
+end)
+
+TabButtons[1].MouseButton1Click:Fire()
