@@ -7,7 +7,7 @@ local mouse = player:GetMouse()
 
 -- GUI Principal
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "MoonHub_InkGame"
+ScreenGui.Name = "Moon_Hub"
 
 -- Janela Principal
 local mainFrame = Instance.new("Frame", ScreenGui)
@@ -33,7 +33,7 @@ UIStroke.Transparency = 0.3
 -- Título
 local title = Instance.new("TextLabel", mainFrame)
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Moon Hub🌙 - Ink Game"
+title.Text = "Moon Hub🌙"
 title.TextColor3 = Color3.fromRGB(0, 170, 255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 16
